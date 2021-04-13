@@ -194,13 +194,14 @@ if ($new_total_points -gt $total_points + $server_points){
 
 # Allocate computers to the groups with weight distribution
 $allocated_computers = @()
+$margin = $points_per_server + $server_points
 $groups.Keys | Foreach-Object {
     $points_consumed = $groups[$_]['points']
     Write-Host "STATUS $_ currently has $points_consumed points consumed"
     if($points_consumed -lt $new_points_per_server){
         foreach ($computer in $available_computers) {
             if($points_consumed -ge $new_points_per_server){
-                Write-Host "ALLOCATION - $_ ending with $points_consumed points - Recommended level is $points_per_server"
+                Write-Host "ALLOCATION - $_ ending with $points_consumed points - Recommended level is $margin"
                 break
             } else {
                 Add-ADGroupMember -Identity $_ -Members $computer
@@ -215,6 +216,10 @@ $groups.Keys | Foreach-Object {
             }
         }
     } else {
-        Write-Host "NO ALLOCATION - $_ exceeds or meets the maximum points allocated at a total of $points_consumed with a recommended point value of $points_per_server"
+        if($points_consumed -gt $total_points + $server_points){
+            Write-Host "NO ALLOCATION - $_ exceeds recommended maximum point allocation of $points_per_server. Current points is $points_consumed"
+        } else {
+            Write-Host "NO ALLOCATION - $_ within acceptable range at $points_consumed and recommended upper value of $margin"
+        }
     }
 }
