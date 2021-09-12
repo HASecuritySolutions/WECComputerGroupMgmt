@@ -1,4 +1,10 @@
 $subscription = 'Default'
+$Folder = 'C:\scripts'
+"Test to see if folder [$Folder]  exists"
+if (Test-Path -Path $Folder) {
+} else {
+    md $Folder > $null
+}
 if(Test-Path -Path C:\scripts\ManageWECRegistry.log){
     Move-Item C:\scripts\ManageWECRegistry.log C:\scripts\ManageWECRegistry.log.bak -Force
 }
